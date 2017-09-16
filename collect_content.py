@@ -26,7 +26,7 @@ class ContentCollector(object):
         return subreddit
 
     def get_comments(self, subreddit):
-        submissions = subreddit.new(limit=3)
+        submissions = subreddit.new(limit=2)
         comments_content = []
         appeared_authors = {}
         for submission in submissions:
@@ -41,7 +41,7 @@ class ContentCollector(object):
                     }
                     if comment.author.name not in appeared_authors:
                         appeared_authors[comment.author.name] = True
-                        comments_content.append(self.get_recent_general_comments_by_author(comment.author.name))
+                        comments_content = comments_content + self.get_recent_general_comments_by_author(comment.author.name)
                 except AttributeError:
                     continue
                 comments_content.append(content)
@@ -55,7 +55,7 @@ class ContentCollector(object):
     def get_recent_general_comments_by_author(self, author):
         # gets users comments from out of subreddit
         comments = []
-        for comment in self.reddit.redditor(author).comments.new(limit=100):
+        for comment in self.reddit.redditor(author).comments.new(limit=10):
             content = {
                 'body': comment.body,
                 'author': comment.author.name,
