@@ -30,8 +30,14 @@ class ContentCollector(object):
         comments_content = []
         appeared_authors = {}
         for submission in submissions:
-            comments_content = []
-            submission.comments.replace_more(limit=30)
+            submission.comments.replace_more(limit=32)
+            try:
+                comments_content.append({
+                    'body': submission.selftext,
+                    'author': submission.author.name,
+                })
+            except AttributeError:
+                logger.warn("AUthor not found")
             all_comments = submission.comments.list()
             for comment in all_comments:
                 try:
@@ -49,7 +55,7 @@ class ContentCollector(object):
         return comments_content
 
     def store_comments(self, comments):
-        with open('data.txt', 'w') as outfile:
+        with open(SUBREDDIT + '_data.txt', 'w') as outfile:
             json.dump(comments, outfile)
 
     def get_recent_general_comments_by_author(self, author):
