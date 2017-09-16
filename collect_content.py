@@ -26,8 +26,9 @@ class ContentCollector(object):
         return subreddit
 
     def get_comments(self, subreddit):
-        submissions = subreddit.new(limit=1000)
+        submissions = subreddit.new(limit=3)
         comments_content = []
+        appeared_authors = {}
         for submission in submissions:
             comments_content = []
             submission.comments.replace_more(limit=30)
@@ -38,6 +39,9 @@ class ContentCollector(object):
                         'body': comment.body,
                         'author': comment.author.name,
                     }
+                    if comment.author.name not in appeared_authors:
+                        appeared_authors[comment.author.name] = True
+                        comments_content.append(self.get_recent_general_comments_by_author(comment.author.name))
                 except AttributeError:
                     continue
                 comments_content.append(content)
@@ -47,6 +51,20 @@ class ContentCollector(object):
     def store_comments(self, comments):
         with open('data.txt', 'w') as outfile:
             json.dump(comments, outfile)
+
+    def get_recent_general_comments_by_author(self, author):
+        # gets users comments from out of subreddit
+        comments = []
+        for comment in self.reddit.redditor(author).comments.new(limit=100):
+            content = {
+                'body': comment.body,
+                'author': comment.author.name,
+            }
+            if comment.subreddit == SUBREDDIT:
+                continue
+            comments.append(content)
+        return comments
+
 
 
 ContentCollector()
