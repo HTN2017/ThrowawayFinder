@@ -1,0 +1,52 @@
+import praw
+import logging
+import json
+logger = logging.getLogger()
+CLIENT_ID = ''
+CLIENT_SECRET = ''
+PASSWORD = ''
+USERNAME = ''
+USER_AGENT = ''
+SUBREDDIT = ''
+
+
+class ContentCollector(object):
+
+    def __init__(self):
+        self.reddit = praw.Reddit(
+            client_id=CLIENT_ID,
+            client_secret=CLIENT_SECRET,
+            password=PASSWORD,
+            user_agent=USER_AGENT,
+            username=USERNAME)
+        self.get_comments(self.get_sub_reddit())
+
+    def get_sub_reddit(self):
+        subreddit = self.reddit.subreddit(SUBREDDIT)
+        return subreddit
+
+    def get_comments(self, subreddit):
+        submissions = subreddit.new(limit=1000)
+        comments_content = []
+        for submission in submissions:
+            comments_content = []
+            submission.comments.replace_more(limit=30)
+            all_comments = submission.comments.list()
+            for comment in all_comments:
+                try:
+                    content = {
+                        'body': comment.body,
+                        'author': comment.author.name,
+                    }
+                except AttributeError:
+                    continue
+                comments_content.append(content)
+        self.store_comments(comments_content)
+        return comments_content
+
+    def store_comments(self, comments):
+        with open('data.txt', 'w') as outfile:
+            json.dump(comments, outfile)
+
+
+ContentCollector()
