@@ -2,12 +2,7 @@ import praw
 import logging
 import json
 logger = logging.getLogger()
-CLIENT_ID = ''
-CLIENT_SECRET = ''
-PASSWORD = ''
-USERNAME = ''
-USER_AGENT = ''
-SUBREDDIT = ''
+from constants import *
 
 
 class ContentCollector(object):
@@ -26,7 +21,7 @@ class ContentCollector(object):
         return subreddit
 
     def get_comments(self, subreddit):
-        submissions = subreddit.new(limit=100)
+        submissions = subreddit.new(limit=10)
         comments_content = []
         appeared_authors = {}
         for submission in submissions:

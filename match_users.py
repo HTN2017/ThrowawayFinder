@@ -6,12 +6,7 @@ from sklearn.svm import LinearSVC
 from sklearn.model_selection import train_test_split
 from sklearn.calibration import CalibratedClassifierCV
 import numpy as np
-CLIENT_ID = ''
-CLIENT_SECRET = ''
-PASSWORD = ''
-USERNAME = ''
-USER_AGENT = ''
-SUBREDDIT = ''
+from .constants import *
 
 
 class LinearSVC_proba(LinearSVC):

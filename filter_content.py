@@ -2,13 +2,7 @@ import praw
 import logging
 import json
 logger = logging.getLogger()
-CLIENT_ID = ''
-CLIENT_SECRET = ''
-PASSWORD = ''
-USERNAME = ''
-USER_AGENT = ''
-SUBREDDIT = ''
-
+from .constants import *
 MINUMIM_COMMENTS = 10
 
 
