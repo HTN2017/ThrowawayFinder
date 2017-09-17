@@ -6,29 +6,17 @@ from sklearn.svm import LinearSVC
 from sklearn.model_selection import train_test_split
 from sklearn.calibration import CalibratedClassifierCV
 import numpy as np
-from .constants import *
-
-
-class LinearSVC_proba(LinearSVC):
-    # class source: http://www.erogol.com/predict-probabilities-sklearn-linearsvc/
-    def __platt_func(self,x):
-        return 1/(1+np.exp(-x))
-
-    def predict_proba(self, X):
-        f = np.vectorize(self.__platt_func)
-        raw_predictions = self.decision_function(X)
-        platt_predictions = f(raw_predictions)
-        probs = platt_predictions / platt_predictions.sum(axis=1)[:, None]
-        return probs
+from constants import *
 
 
 class MatchUsers(object):
 
-    def __init__(self):
+    def __init__(self, SUBREDDIT):
+        self.SUBREDDIT = SUBREDDIT
         self.get_data()
 
     def get_data(self):
-        with open(SUBREDDIT + '_filter.txt') as data_file:
+        with open(self.SUBREDDIT + '_filter.txt') as data_file:
             data = json.load(data_file)
         self.raw_data = data
 
@@ -66,4 +54,4 @@ class MatchUsers(object):
         return display_dict
 
 
-MatchUsers().match_results()
+#MatchUsers('uwaterloo').match_results()

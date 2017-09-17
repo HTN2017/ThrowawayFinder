@@ -2,24 +2,34 @@ import praw
 import logging
 import json
 logger = logging.getLogger()
-from .constants import *
+from constants import *
+import os
 MINUMIM_COMMENTS = 10
 
 
 class FilterContent():
 
-    def __init__(self):
+    def __init__(self, SUBREDDIT):
         self.reddit = praw.Reddit(
             client_id=CLIENT_ID,
             client_secret=CLIENT_SECRET,
             password=PASSWORD,
             user_agent=USER_AGENT,
             username=USERNAME)
+        self.SUBREDDIT = SUBREDDIT
+
+    def check_for_file(self):
+        if os.path.exists(self.SUBREDDIT + '_filter.txt'):
+            logger.warning("Opened")
+            return True
+        return False
 
     def get_data(self):
-        with open(SUBREDDIT + '_data.txt') as data_file:
+        with open(self.SUBREDDIT + '_data.txt') as data_file:
             data = json.load(data_file)
         self.raw_data = data
+        if self.check_for_file():
+            return
         self.set_author_list(data)
         self.store_author_list(self.format_author_list())
 
@@ -59,7 +69,7 @@ class FilterContent():
                     self.authors[comment['author']].append(comment['body'])
 
     def store_author_list(self, comments):
-        with open(SUBREDDIT + '_filter.txt', 'w') as outfile:
+        with open(self.SUBREDDIT + '_filter.txt', 'w') as outfile:
             json.dump(comments, outfile)
 
     def is_throw_away(self, author):
@@ -76,4 +86,5 @@ class FilterContent():
                 return False
         return True
 
-logger.warning(FilterContent().get_data())
+
+#FilterContent('uwaterloo').get_data()

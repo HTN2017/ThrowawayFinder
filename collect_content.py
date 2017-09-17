@@ -1,24 +1,34 @@
 import praw
 import logging
 import json
+import os
 logger = logging.getLogger()
 from constants import *
 
 
 class ContentCollector(object):
 
-    def __init__(self):
+    def __init__(self, SUBREDDIT):
         self.reddit = praw.Reddit(
             client_id=CLIENT_ID,
             client_secret=CLIENT_SECRET,
             password=PASSWORD,
             user_agent=USER_AGENT,
             username=USERNAME)
+        self.SUBREDDIT = SUBREDDIT
+        if self.check_for_file(): # if data file exists dont collect again
+            return
         self.get_comments(self.get_sub_reddit())
 
     def get_sub_reddit(self):
-        subreddit = self.reddit.subreddit(SUBREDDIT)
+        subreddit = self.reddit.subreddit(self.SUBREDDIT)
         return subreddit
+
+    def check_for_file(self):
+        if os.path.exists(self.SUBREDDIT + '_data.txt'):
+            logger.warning("Opened")
+            return True
+        return False
 
     def get_comments(self, subreddit):
         submissions = subreddit.new(limit=10)
@@ -50,7 +60,7 @@ class ContentCollector(object):
         return comments_content
 
     def store_comments(self, comments):
-        with open(SUBREDDIT + '_data.txt', 'w') as outfile:
+        with open(self.SUBREDDIT + '_data.txt', 'w') as outfile:
             json.dump(comments, outfile)
 
     def get_recent_general_comments_by_author(self, author):
@@ -61,11 +71,11 @@ class ContentCollector(object):
                 'body': comment.body,
                 'author': comment.author.name,
             }
-            if comment.subreddit == SUBREDDIT:
+            if comment.subreddit == self.SUBREDDIT:
                 continue
             comments.append(content)
         return comments
 
 
 
-ContentCollector()
+#ContentCollector('uwaterloo')
