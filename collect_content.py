@@ -26,7 +26,7 @@ class ContentCollector(object):
         return subreddit
 
     def get_comments(self, subreddit):
-        submissions = subreddit.new(limit=2)
+        submissions = subreddit.new(limit=100)
         comments_content = []
         appeared_authors = {}
         for submission in submissions:

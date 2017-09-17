@@ -37,13 +37,11 @@ class FilterContent():
                     'data': comment,
                     'author': author,
                 })
-        throw_comments = []
+        throw_comments = {}
         for author in self.throwaway_authors:
+            throw_comments[author] = ""
             for comment in self.throwaway_authors[author]:
-                throw_comments.append({
-                    'data': comment,
-                    'author': author,
-                })
+                throw_comments[author] += (" " + comment)
         return {
             'normal': normal_comments,
             'throw': throw_comments
@@ -73,13 +71,12 @@ class FilterContent():
     def is_throw_away(self, author):
         if "throwaway" in author.lower():
             return True
-        data = self.reddit.get('/user/' + author)
         trophies = self.reddit.get("/user/" + author + "/trophies")['data']['trophies']
         for trophy in trophies:
             if trophy['data']['name'] == 'Verified Email':
                 return False
         comment_count = 0
-        for comment in self.reddit.redditor(author).comments.new(limit=None):
+        for comment in self.reddit.redditor(author).comments.new(limit=MINUMIM_COMMENTS):
             comment_count += 1
             if comment_count == MINUMIM_COMMENTS:
                 return False
